@@ -1,34 +1,74 @@
-import { Component } from '@angular/core';
-import { ModalDismissReasons, NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { Component, OnInit } from '@angular/core';
+import {
+  AbstractControl,
+  FormBuilder,
+  FormGroup,
+  Validators
+} from '@angular/forms';
+
+// import Validation from './utils/validation';
+import { checkFormControlCss } from './utils/formUtils';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent {
-  closeResult = '';
+export class AppComponent implements OnInit {
 
-	constructor(private modalService: NgbModal) {}
+  userForm: any;
+  checkFormControlCss = checkFormControlCss;
 
-	open(content: any) {
-		this.modalService.open(content, { ariaLabelledBy: 'modal-basic-title' }).result.then(
-			(result) => {
-				this.closeResult = `Closed with: ${result}`;
-			},
-			(reason) => {
-				this.closeResult = `Dismissed ${this.getDismissReason(reason)}`;
-			},
-		);
-	}
+  constructor(private formBuilder: FormBuilder,
+    private toastr: ToastrService) { }
 
-	private getDismissReason(reason: any): string {
-		if (reason === ModalDismissReasons.ESC) {
-			return 'by pressing ESC';
-		} else if (reason === ModalDismissReasons.BACKDROP_CLICK) {
-			return 'by clicking on a backdrop';
-		} else {
-			return `with: ${reason}`;
-		}
-	}
+  ngOnInit(): void {
+    this.initForm();
+  }
+
+  initForm() {
+    this.userForm = this.formBuilder.group({
+      name: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      address: ['', Validators.required],
+      mobile: ['', [Validators.required, Validators.pattern('[0-9]{9}')]],
+      age: ['', [Validators.required, Validators.min(18), Validators.max(100)]],
+      gender: ['', Validators.required]
+    });
+  }
+
+  submitForm(): void {
+    if (this.userForm.valid) {
+      this.toastr.success('Formulario Valido', 'Todos los datos son correctos');
+      console.log('Form data:', this.userForm.value);
+    } else {
+      this.toastr.error('Formulario Incorrecto', 'Los datos no son correctos');
+      console.error('Form data:', this.userForm.value);
+    }
+  }
+
+  get name(): AbstractControl {
+    return this.userForm.get('name');
+  }
+
+  get email(): AbstractControl {
+    return this.userForm.get('email');
+  }
+
+  get address(): AbstractControl {
+    return this.userForm.get('address');
+  }
+
+  get mobile(): AbstractControl {
+    return this.userForm.get('mobile');
+  }
+
+  get age(): AbstractControl {
+    return this.userForm.get('age');
+  }
+
+  get gender(): AbstractControl {
+    return this.userForm.get('gender');
+  }
 }
