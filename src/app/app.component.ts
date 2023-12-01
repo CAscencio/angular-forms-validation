@@ -31,9 +31,12 @@ export class AppComponent implements OnInit {
     this.userForm = this.formBuilder.group({
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
+      typeDocument: ['', [Validators.required]],
+      documentNumber: ['', [Validators.required]],
       address: ['', Validators.required],
-      mobile: ['', [Validators.required, Validators.pattern('[0-9]{9}')]],
+      mobile: ['', [Validators.required, Validators.pattern('9[0-9]{8}')]],
       age: ['', [Validators.required, Validators.min(18), Validators.max(100)]],
+      date: ['', Validators.required],
       gender: ['', Validators.required]
     });
   }
@@ -47,6 +50,36 @@ export class AppComponent implements OnInit {
       console.error('Form data:', this.userForm.value);
     }
   }
+  
+  imprimir(event: any) {
+    console.log('Date: ', this.date.value);
+    
+  }
+
+  selectionChanged(event: any) {
+    const value = event.target.value;
+    console.log('Valor seleccionado: ', value);
+    
+    this.userForm.controls['documentNumber'].clearValidators();
+
+    if (value === 'DNI') {      
+      this.userForm.controls['documentNumber'].setValidators([
+        Validators.required,
+        Validators.minLength(8),
+        Validators.maxLength(8)
+      ]);
+    }
+
+    if (value === 'CE') {
+      this.userForm.controls['documentNumber'].setValidators([
+        Validators.required,
+        Validators.minLength(15),
+        Validators.maxLength(15)
+      ]);
+    }
+
+    this.documentNumber.updateValueAndValidity();
+  }
 
   get name(): AbstractControl {
     return this.userForm.get('name');
@@ -54,6 +87,14 @@ export class AppComponent implements OnInit {
 
   get email(): AbstractControl {
     return this.userForm.get('email');
+  }
+
+  get typeDocument(): AbstractControl {
+    return this.userForm.get('typeDocument');
+  }
+
+  get documentNumber(): AbstractControl {
+    return this.userForm.get('documentNumber');
   }
 
   get address(): AbstractControl {
@@ -66,6 +107,10 @@ export class AppComponent implements OnInit {
 
   get age(): AbstractControl {
     return this.userForm.get('age');
+  }
+
+  get date(): AbstractControl {
+    return this.userForm.get('date');
   }
 
   get gender(): AbstractControl {
